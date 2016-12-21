@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+
+
+<script src="http://cdn.jsdelivr.net/sockjs/0.3.4/sockjs.min.js"></script>
+
+<script src="node_modules/vertx3-eventbus-client/vertx-eventbus.js"></script>
+<script>
+
+    var eb = new EventBus('http://localhost:8080/eventbus');
+
+    eb.onopen = function () {
+        eb.registerHandler('knodes.kmonit.set.fsList', function (error, message) {
+            console.log(message);
+            for (var i = 0; i < message.body.fsList.length; i++) {
+                eb.registerHandler('knodes.kmonit.set.fsUsage.' + message.body.fsList[i], function (error, message) {
+                    console.log('received a message: ' + JSON.stringify(message));
+                });
+            }
+        });
+        eb.send("knodes.kmonit.get.fsList", {});
+    }
+
+</script>
+</body>
+</html>
